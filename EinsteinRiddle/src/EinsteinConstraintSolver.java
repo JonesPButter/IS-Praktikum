@@ -147,4 +147,23 @@ public class EinsteinConstraintSolver {
 	private void addVariable(String name, String type, List<Integer> domain) {
 		variables.put(name, new Variable(type, name, domain));
 	}
+
+	public void ac3la() {
+		// Code from lecture slide "IS-06 Constraints" p. 91
+//		procedure AC3-LA(cv)
+//		Q <- {(Vi,Vcv) in arcs(G),i>cv};
+//		consistent <- true;
+//		while not Q empty & consistent
+//		select and delete any arc (Vk,Vm) from Q;
+//		if REVISE(Vk,Vm) then Q <- Q union {(Vi,Vk)
+//			such that (Vi,Vk) in arcs(G),i#k,i#m,i>cv}
+//		consistent <- not Dk empty
+//		endif
+//				endwhile
+//		return consistent
+//		end AC3-LA
+
+//		Vorlage:
+//		https://github.com/FelixBaumgartner91/IntelligenteSystemePraktikum/tree/master/Praktikum4/src/src
+	}
 }
