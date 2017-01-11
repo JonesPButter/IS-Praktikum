@@ -1,12 +1,12 @@
 import java.util.LinkedList;
 import java.util.List;
 
-public class Variable {
+public class Variable implements Comparable<Variable> {
 
 	private String componentType;
 	private String name;
 	private List<Integer> domain;
-	
+
 	/**
 	 * Inits the Variable
 	 * @param componentType the name of the component, for example "Colour"
@@ -83,9 +83,11 @@ public class Variable {
 
 	@Override
 	public String toString() {
-		return "Variable [componentType=" + componentType + ", name=" + name + ", domain=" + domain + "]";
+		return name + " " + domain;
 	}
-	
-	
-	
+
+	@Override
+	public int compareTo(Variable o) {
+		return getName().compareTo(o.getName());
+	}
 }

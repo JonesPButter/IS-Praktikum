@@ -77,7 +77,7 @@ public class Main {
 		printConstraints(solver.getConstraints());
 		
 		System.out.println("\nStart solving the problem...");
-		solver.ac3();
+		solver.solveRiddle();
 		printVariables(solver.getVariables());
 	}
 

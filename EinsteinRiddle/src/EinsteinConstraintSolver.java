@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class EinsteinConstraintSolver {
 
 	// Contains all Variables (25 in total for this riddle)
 	Map<String, Variable> variables;
+
 	// Contains all Constraints. (Edges between variables)
 	Set<Constraint> constraints;
 
@@ -30,9 +32,11 @@ public class EinsteinConstraintSolver {
 			Constraint currentConstraint = queue.poll();
 			if (revise(currentConstraint)) {
 				for (Constraint otherConstraint : constraints) {
+
 					// wenn der andere constraint auf den current constraint "zeigt"
 					if (otherConstraint.getToVar().equals(currentConstraint.getFromVar())) {
-						// keine zyklische Kante
+
+							// keine zyklische Kante
 						if (otherConstraint.getFromVar().equals(otherConstraint.getToVar()) || otherConstraint.getFromVar().equals(currentConstraint.getToVar())) {
 							continue;
 						}
@@ -48,9 +52,11 @@ public class EinsteinConstraintSolver {
 	 */
 	private boolean revise(Constraint constraint) {
 		boolean removed = false;
+
 		// D(x)
 		List<Integer> domain = constraint.getFromVar().getDomain();
 		for(int value : new ArrayList<>(domain)){
+
 			// remove all values from D(x) that doesn't pass the constraint.
 			if (!check(constraint, value)) {
 				domain.remove(domain.indexOf(value));
@@ -148,22 +154,108 @@ public class EinsteinConstraintSolver {
 		variables.put(name, new Variable(type, name, domain));
 	}
 
-	public void ac3la() {
-		// Code from lecture slide "IS-06 Constraints" p. 91
-//		procedure AC3-LA(cv)
-//		Q <- {(Vi,Vcv) in arcs(G),i>cv};
-//		consistent <- true;
-//		while not Q empty & consistent
-//		select and delete any arc (Vk,Vm) from Q;
-//		if REVISE(Vk,Vm) then Q <- Q union {(Vi,Vk)
-//			such that (Vi,Vk) in arcs(G),i#k,i#m,i>cv}
-//		consistent <- not Dk empty
-//		endif
-//				endwhile
-//		return consistent
-//		end AC3-LA
+	public boolean ac3la(Variable variable) {
+		if (variable.getName().equals("Rothmanns")) {
+			System.out.println("Variable: " + variable);
+		}
 
-//		Vorlage:
-//		https://github.com/FelixBaumgartner91/IntelligenteSystemePraktikum/tree/master/Praktikum4/src/src
+		// filter constraints so we only look at those that are affected by the current change
+		Queue<Constraint> currentQueue = constraints.stream()
+				.filter(x -> x.getFromVar().compareTo(variable) > 0 && x.getToVar().compareTo(variable) == 0)
+				.collect(Collectors.toCollection(LinkedList::new));
+		boolean isConsistent = true;
+
+		while (!currentQueue.isEmpty() && isConsistent) {
+
+			Constraint currentConstraint = currentQueue.poll();
+			if (revise(currentConstraint)) {
+
+				// add new entries to queue
+				constraints.stream()
+
+						// get all constraints that target the start of the current constraint
+						.filter(x -> x.getToVar().equals(currentConstraint.getFromVar()))
+
+						// exclude cyclic constraints
+						.filter(x -> !x.getToVar().equals(x.getFromVar()))
+
+						// exclude the reverse contraint
+						.filter(x -> !x.getFromVar().equals(currentConstraint.getToVar()))
+
+						// only take those that affect variables we did not handle within soveRiddle()
+						.filter(x -> x.getFromVar().compareTo(variable) > 0)
+
+						// add entries to queue
+						.forEach(x -> {
+							if (variable.getName().equals("Rothmanns")) {
+								System.out.println("    " + x);
+							}
+							currentQueue.add(x);
+						});
+
+				isConsistent = !currentConstraint.getFromVar().getDomain().isEmpty();
+			}
+		}
+
+		return isConsistent;
+	}
+
+	public void solveRiddle() {
+
+		// create edge consistency
+		ac3();
+
+		List<Variable> sorted = new ArrayList<>(variables.values());
+		sorted.sort(Variable::compareTo);
+
+		for(int i = 0; i < sorted.size(); i++) {
+			Variable currentVariable = sorted.get(i);
+
+			List<Variable> variablesBackup = createVariableBackup(sorted);
+			boolean valueFound = false;
+			while (!valueFound) {
+				if (currentVariable.getDomain().size() > 1) {
+					List<Integer> domainBackup = new ArrayList<>(currentVariable.getDomain());
+					List<Integer> testDomain = new ArrayList<>();
+
+					// try first possible value
+					testDomain.add(currentVariable.getDomain().get(0));
+					currentVariable.setDomain(testDomain);
+
+					// check if the currently set domain causes "trouble"
+					if (!ac3la(currentVariable)) {
+
+						// reset local & global state
+						sorted = variablesBackup;
+						variablesBackup.forEach(x -> variables.put(x.getName(), x));
+
+						// remove the value that failed from backup domain
+						domainBackup.remove(0);
+
+						// update local & global state
+						currentVariable.setDomain(domainBackup);
+						variables.put(currentVariable.getName(), currentVariable);
+					}
+					else {
+						valueFound = true;
+					}
+				}
+				else if (currentVariable.getDomain().isEmpty()) {
+					System.out.println("No value possible for variable " + currentVariable.getName());
+					break;
+				}
+				else {
+					valueFound = true;
+				}
+			}
+		}
+	}
+
+	private List<Variable> createVariableBackup(List<Variable> variables) {
+		List<Variable> backup = new ArrayList<>(variables.size());
+		for(Variable current : variables) {
+			backup.add(new Variable(current));
+		}
+		return backup;
 	}
 }

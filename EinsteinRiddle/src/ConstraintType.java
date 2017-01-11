@@ -4,5 +4,5 @@
  *
  */
 public enum ConstraintType {
-	equal, unequal, leftTo, rightTo, nextTo, middle, first;
+	equal, unequal, leftTo, rightTo, nextTo, middle, first
 }

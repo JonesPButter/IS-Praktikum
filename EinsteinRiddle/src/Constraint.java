@@ -53,7 +53,7 @@ public class Constraint {
 
 	@Override
 	public String toString() {
-		return "Constraint [contraintType=" + contraintType + ", fromVar=" + fromVar + ", toVar=" + toVar + "]";
+		return fromVar + " " + contraintType + " " + toVar;
 	}
 	
 	
