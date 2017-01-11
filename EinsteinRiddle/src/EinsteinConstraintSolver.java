@@ -17,6 +17,10 @@ public class EinsteinConstraintSolver {
 	// Contains all Constraints. (Edges between variables)
 	Set<Constraint> constraints;
 
+	public Variable getVariable(String name) {
+		return variables.get(name);
+	}
+
 	/**
 	 * Initializes the constrains solver class.
 	 */
@@ -88,9 +92,7 @@ public class EinsteinConstraintSolver {
 	 *            example "Red"
 	 */
 	public void addConstraint(ConstraintType type, String from, String to) {
-		Variable v1 = variables.get(from);
-		Variable v2 = variables.get(to);
-		constraints.add(new Constraint(type, v1, v2));
+		constraints.add(new Constraint(type, from, to, this));
 	}
 
 	public Map<String, Variable> getVariables() {

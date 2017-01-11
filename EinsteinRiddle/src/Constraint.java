@@ -9,51 +9,45 @@ public class Constraint {
 	
 	// the type of the Constraint between the two houses
 	ConstraintType contraintType;
+
 	// start
-	Variable fromVar;
+	String from;
+
 	// end
-	Variable toVar;
-	
+	String to;
+
+	EinsteinConstraintSolver solver;
 	/**
 	 * 
 	 * @param contraintType the constraint
-	 * @param fromVar from
-	 * @param toVar to
+	 * @param from from
+	 * @param to to
 	 */
-	public Constraint(ConstraintType contraintType, Variable fromVar, Variable toVar) {
+	public Constraint(ConstraintType contraintType, String from, String to, EinsteinConstraintSolver solver) {
 		super();
 		this.contraintType = contraintType;  
-		this.fromVar = fromVar;
-		this.toVar = toVar;
+		this.from = from;
+		this.to = to;
+		this.solver = solver;
 	}
 
 	public ConstraintType getContraintType() {
 		return contraintType;
 	}
 
-	public void setContraintType(ConstraintType contraintType) {
-		this.contraintType = contraintType;
-	}
 
 	public Variable getFromVar() {
-		return fromVar;
+		return solver.getVariable(from);
 	}
 
-	public void setFromVar(Variable fromVar) {
-		this.fromVar = fromVar;
-	}
 
 	public Variable getToVar() {
-		return toVar;
-	}
-
-	public void setToVar(Variable toVar) {
-		this.toVar = toVar;
+		return solver.getVariable(to);
 	}
 
 	@Override
 	public String toString() {
-		return fromVar + " " + contraintType + " " + toVar;
+		return from + " " + contraintType + " " + to;
 	}
 	
 	
